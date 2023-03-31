@@ -2,52 +2,43 @@ local HttpService = game:GetService("HttpService");
 
 local module = {}
 
-local url = "http://localhost:3000/api/models"
+local url = "http://roblox-part-converter.vercel.app/api/models"
 local key = "iegoesjiogjseiohnrdeiuohfngby"
 
-function rgbToHex(rgb: table) 
-	local hexadecimal = ''
+function color3ToHex(color)
+    local r = math.floor(color.R * 255)
+    local g = math.floor(color.G * 255)
+    local b = math.floor(color.B * 255)
 
-	for key, value in pairs(rgb) do
-		local hex = ''
-		while(value > 0)do
-			local index = math.fmod(value, 16) + 1
-			value = math.floor(value / 16)
-			hex = string.sub('0123456789ABCDEF', index, index) .. hex			
-		end
-		if(string.len(hex) == 0)then
-			hex = '00'
-		elseif(string.len(hex) == 1)then
-			hex = '0' .. hex
-		end
-		hexadecimal = hexadecimal .. hex
-	end
-	return hexadecimal
+    local hex = string.format("%02x%02x%02x", r, g, b)
+
+    return hex
 end
 
 function convertInstances(Instances: table)
-	local data = {}
+	local data = {parts = {}}
 	for _, instance in pairs(Instances) do
 		local instanceData = {
 			position = {
-				x = instance.Position.X,
-				y = instance.Position.Y,
-				z = instance.Position.Z
+				X = instance.Position.X,
+				Y = instance.Position.Y,
+				Z = instance.Position.Z
 			},
 			rotation = {
-				x = instance.Rotation.X,
-				y = instance.Rotation.Y,
-				z = instance.Rotation.Z
+				X = instance.Rotation.X,
+				Y = instance.Rotation.Y,
+				Z = instance.Rotation.Z
 			},
-			color = rgbToHex({R = instance.Color.R, G = instance.Color.G, B = instance.Color.B}),
+			color = color3ToHex(instance.color),
 			size = {
-				x = instance.Size.X,
-				y = instance.Size.Y,
-				z = instance.Size.Z
+				X = instance.Size.X,
+				Y = instance.Size.Y,
+				Z = instance.Size.Z
 			},
 		}
-		table.insert(data, instanceData)
+		table.insert(data.parts, instanceData)
 	end
+	return data;
 end
 
 function module:upload(Instances: table) 
@@ -55,7 +46,7 @@ function module:upload(Instances: table)
 
 	local response, responseData
 	pcall(function()
-		response = HttpService:PostAsync(url + "?key=" + key, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson) 
+		response = HttpService:PostAsync(url .. "?key=" .. key, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson) 
 		responseData = HttpService:JSONDecode(response)
 	end)
 
