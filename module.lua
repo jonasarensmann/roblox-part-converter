@@ -2,8 +2,8 @@ local HttpService = game:GetService("HttpService");
 
 local module = {}
 
-local url = "http://roblox-part-converter.vercel.app/api/models"
-local key = "iegoesjiogjseiohnrdeiuohfngby"
+local url = "https://url.com"
+local key = "api_key"
 
 function color3ToHex(color)
     local r = math.floor(color.R * 255)
